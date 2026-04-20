@@ -81,89 +81,6 @@
   </div>
 </section>
 
-<!-- CATALOGO -->
-<section id="catalogo" class="catalogo">
-  <div class="catalogo-header">
-    <div>
-      <p class="section-tag">Catálogo</p>
-      <h2 class="section-title">Nuestras plantas</h2>
-    </div>
-    <a href="ver-todo.html" class="btn-secondary">Ver todo →</a>
-  </div>
-
-  <div class="cards-grid">
-    <div class="plant-card reveal">
-      <div class="plant-img bg2">🌸</div>
-      <div class="plant-info">
-        <div class="plant-name">Suculentas</div>
-        <div class="plant-desc">Selección de suculentas resistentes de nuestra casa.</div>
-        <div class="plant-footer">
-          <a href="suculentas.html" class="btn-agregar">Ver más</a>
-        </div>
-      </div>
-    </div>
-
-        <div class="plant-card reveal">
-      <div class="plant-img bg6">🪴</div>
-      <div class="plant-info">
-        <div class="plant-name">Plantas de interior</div>
-        <div class="plant-desc">Ficus, diefenbaquias, filodendros. Grandes y hermosas para cualquier ambiente.</div>
-        <div class="plant-footer">
-          <a href="interior.html" class="btn-agregar">Ver más</a>
-        </div>
-      </div>
-    </div>
-    <div class="plant-card reveal">
-      <div class="plant-img bg3">🌿
-        <span class="plant-badge">Nuevo</span>
-      </div>
-      <div class="plant-info">
-        <div class="plant-name">Plantas Exterior</div>
-        <div class="plant-desc">Pothos, hiedras y más. Transforma cualquier rincón en un oasis verde.</div>
-        <div class="plant-footer">
-
-          <a href="colgantes.html" class="btn-agregar">Ver más</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="plant-card reveal">
-      <div class="plant-img bg4">🌻</div>
-      <div class="plant-info">
-        <div class="plant-name">Aromáticas</div>
-        <div class="plant-desc">Lavanda, romero, menta y más. Para tu jardín, cocina o simplemente disfrutar.</div>
-        <div class="plant-footer">
-          <a href="aromaticas.html" class="btn-agregar">Ver más</a>
-        </div>
-      </div>
-    </div>
-
-    <div class="plant-card reveal">
-      <div class="plant-img bg5">
-        🌺
-      </div>
-      <div class="plant-info">
-        <div class="plant-name">Flores</div>
-        <div class="plant-desc">Elegancia pura. Variedades seleccionadas para regalo o decoración especial.</div>
-        <div class="plant-footer">
-          <a href="orquideas.html" class="btn-agregar">Ver más</a>
-        </div>
-      </div>
-    </div>
-
-      <div class="plant-card reveal">
-      <div class="plant-img bg6">🪴</div>
-      <div class="plant-info">
-        <div class="plant-name">Huerta</div>
-        <div class="plant-desc">Ficus, diefenbaquias, filodendros. Grandes y hermosas para cualquier ambiente.</div>
-        <div class="plant-footer">
-          <a href="interior.html" class="btn-agregar">Ver más</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- NOSOTROS -->
 <section id="nosotros" style="padding: 2rem 4rem 5rem;">
   <div class="about">
@@ -196,6 +113,109 @@
           <span class="value-icon">🤝</span>
           <div class="value-title">Asesoramiento</div>
           <div class="value-desc">Te acompañamos con consejos de cuidado.</div>
+        </div>
+      </div>
+  </div>
+</section>
+
+<!-- CATALOGO -->
+<section id="catalogo" class="catalogo">
+  <div class="catalogo-header">
+    <div>
+      <p class="section-tag">Catálogo</p>
+      <h2 class="section-title">Nuestras plantas</h2>
+    </div>
+    <a href="ver-todo.html" class="btn-secondary">Ver todo →</a>
+  </div>
+
+  <div class="cards-grid">
+    <!-- EJEMPLO: CACTUS AÑADIDO MANUALMENTE -->
+    <div class="plant-card reveal">
+      <div class="plant-img bg1">
+        🌵
+        <!-- Si quieres usar una foto: <img src="ruta/a/tu/foto.jpg" alt="Cactus"> -->
+      </div>
+      <div class="plant-info">
+        <div class="plant-name">Cactus San Pedro</div>
+        <div class="plant-desc">Crecimiento columnar y gran resistencia. Ideal para exterior.</div>
+        <div class="plant-footer">
+          <span class="plant-price">$2.500</span>
+          <button class="btn-agregar" onclick="addToCart('Cactus San Pedro', 2500, '🌵')">Añadir al carrito</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="plant-card reveal">
+      <div class="plant-img bg1">
+        🌵
+      </div>
+      <div class="plant-info">
+        <div class="plant-name">Cactus Mini</div>
+        <div class="plant-desc">Variedad de cactus pequeños listos para decorar.</div>
+        <div class="plant-footer">
+          <a href="cactus.html" class="btn-agregar">Ver más</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="plant-card reveal">
+      <div class="plant-img bg2">🌸</div>
+      <div class="plant-info">
+        <div class="plant-name">Suculentas Mix</div>
+        <div class="plant-desc">Selección de suculentas resistentes de nuestra casa.</div>
+        <div class="plant-footer">
+          <a href="suculentas.html" class="btn-agregar">Ver más</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="plant-card reveal">
+      <div class="plant-img bg3">
+        🌿
+        <span class="plant-badge">Nuevo</span>
+      </div>
+      <div class="plant-info">
+        <div class="plant-name">Plantas colgantes</div>
+        <div class="plant-desc">Pothos, hiedras y más. Transforma cualquier rincón en un oasis verde.</div>
+        <div class="plant-footer">
+
+          <a href="colgantes.html" class="btn-agregar">Ver más</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="plant-card reveal">
+      <div class="plant-img bg4">🌻</div>
+      <div class="plant-info">
+        <div class="plant-name">Aromáticas</div>
+        <div class="plant-desc">Lavanda, romero, menta y más. Para tu jardín, cocina o simplemente disfrutar.</div>
+        <div class="plant-footer">
+          <a href="aromaticas.html" class="btn-agregar">Ver más</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="plant-card reveal">
+      <div class="plant-img bg5">
+        🌺
+        <span class="plant-badge">Exclusivo</span>
+      </div>
+      <div class="plant-info">
+        <div class="plant-name">Orquídeas</div>
+        <div class="plant-desc">Elegancia pura. Variedades seleccionadas para regalo o decoración especial.</div>
+        <div class="plant-footer">
+          <a href="orquideas.html" class="btn-agregar">Ver más</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="plant-card reveal">
+      <div class="plant-img bg6">🪴</div>
+      <div class="plant-info">
+        <div class="plant-name">Plantas de interior</div>
+        <div class="plant-desc">Ficus, diefenbaquias, filodendros. Grandes y hermosas para cualquier ambiente.</div>
+        <div class="plant-footer">
+          <a href="interior.html" class="btn-agregar">Ver más</a>
         </div>
       </div>
     </div>
@@ -274,6 +294,7 @@
       <span id="cartTotalText">$0</span>
     </div>
     <button class="btn-primary" style="width: 100%; border: none; cursor: pointer;" onclick="sendCartWhatsApp()">Enviar pedido por WhatsApp 🌿</button>
+    <button class="btn-share" onclick="shareCartSocial()">Compartir carrito 📤</button>
     <button class="btn-clear" onclick="clearCart()">Vaciar Carrito</button>
   </div>
 </div>

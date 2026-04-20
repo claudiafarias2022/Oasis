@@ -1,65 +1,33 @@
 // --- BASE DE DATOS DE PRODUCTOS ---
-const PRODUCTS_DATA = [
-  { name: 'Cactus San Pedro', price: 2500, img: '🌵', image: '', desc: 'Crecimiento columnar y gran resistencia.', bg: 'bg1', category: 'cactus', stock: 5 },
-  { name: 'Asiento de Suegra', price: 3200, img: '🌵', image: '', desc: 'Cactus redondo y espinoso, muy decorativo.', bg: 'bg1', category: 'cactus', stock: 2 },
-  { name: 'Mini Cactus Mix', price: 1800, img: '🌵', image: '', desc: 'Set de 3 mini cactus en macetas decoradas.', bg: 'bg1', category: 'cactus', stock: 10 },
-  { name: 'Echeveria Elegans', price: 1200, img: '🌸', image: '', desc: 'Forma de roseta perfecta para escritorios.', bg: 'bg2', category: 'suculentas', stock: 8 },
-  { name: 'Ficus Pandurata', price: 5500, img: '🪴', image: '', desc: 'La estrella de los interiores modernos.', bg: 'bg6', category: 'interior', stock: 0 },
-  { name: 'Pothos Varigado', price: 2100, img: '🌿', image: '', desc: 'Ideal para estantes altos y poca luz.', bg: 'bg3', category: 'colgantes', stock: 15 }
+const CATEGORY_EMOJIS = {
+  cactus: '🌵',
+  suculentas: '🌸',
+  interior: '🪴',
+  colgantes: '🌿',
+  aromaticas: '🌻',
+  orquideas: '🌺'
+};
+
+const getDisplayImageHtml = (img, image, category, name) => {
+  const isPath = (str) => typeof str === 'string' && (str.includes('/') || str.includes('.') || str.startsWith('data:'));
+  
+  if (isPath(image)) return `<img src="${image}" alt="${name}" loading="lazy">`;
+  if (isPath(img)) return `<img src="${img}" alt="${name}" loading="lazy">`;
+  
+  // Si no es un path, devolvemos el emoji (prioridad: emoji del producto > emoji de categoría > default)
+  return img || CATEGORY_EMOJIS[category] || '🪴';
+};
+
+const INITIAL_PRODUCTS_DATA = [
+  { name: 'Cactus San Pedro', price: 2500, img: '🌵', image: '', desc: 'Crecimiento columnar y gran resistencia.', bg: 'bg1', category: 'cactus' },
+  { name: 'Asiento de Suegra', price: 3200, img: '🌵', image: '', desc: 'Cactus redondo y espinoso, muy decorativo.', bg: 'bg1', category: 'cactus' },
+  { name: 'Mini Cactus Mix', price: 1800, img: '🌵', image: '', desc: 'Set de 3 mini cactus en macetas decoradas.', bg: 'bg1', category: 'cactus' },
+  { name: 'Echeveria Elegans', price: 1200, img: '🌸', image: '', desc: 'Forma de roseta perfecta para escritorios.', bg: 'bg2', category: 'suculentas' },
+  { name: 'Ficus Pandurata', price: 5500, img: '🪴', image: '', desc: 'La estrella de los interiores modernos.', bg: 'bg6', category: 'interior' },
+  { name: 'Pothos Varigado', price: 2100, img: '🌿', image: '', desc: 'Ideal para estantes altos y poca luz.', bg: 'bg3', category: 'colgantes' }
 ];
 
-// --- CARGAR PRODUCTOS NUEVOS (ADMIN) ---
-const loadCustomProducts = () => {
-  const custom = JSON.parse(localStorage.getItem('oasis-custom-products') || '[]');
-  custom.forEach(p => {
-    if (!PRODUCTS_DATA.find(item => item.name === p.name)) {
-      PRODUCTS_DATA.push(p);
-    }
-  }); // Ensure new custom products have default isHidden, img, and image
-  PRODUCTS_DATA.forEach(p => {
-    p.isHidden = p.isHidden ?? false;
-    p.img = p.img ?? '🪴';
-    p.image = p.image ?? '';
-  });
-};
-// loadCustomProducts(); // Moved to general initialization
-
-// --- APLICAR OVERRIDES DE STOCK (ADMIN) ---
-const applyStockOverrides = () => {
-  const overrides = JSON.parse(localStorage.getItem('oasis-stock-overrides') || '{}');
-  PRODUCTS_DATA.forEach(p => {
-    if (overrides[p.name] !== undefined) p.stock = parseInt(overrides[p.name]);
-  });
-};
-// applyStockOverrides(); // Moved to general initialization
-
-// --- APLICAR OVERRIDES DE IMAGEN (ADMIN) ---
-const applyImageOverrides = () => {
-  const overrides = JSON.parse(localStorage.getItem('oasis-image-overrides') || '{}');
-  PRODUCTS_DATA.forEach(p => {
-    if (overrides[p.name] !== undefined) p.image = overrides[p.name];
-  });
-};
-
-// --- APLICAR OVERRIDES DE EMOJI (ADMIN) ---
-const applyEmojiOverrides = () => {
-  const overrides = JSON.parse(localStorage.getItem('oasis-emoji-overrides') || '{}');
-  PRODUCTS_DATA.forEach(p => {
-    if (overrides[p.name] !== undefined) p.img = overrides[p.name];
-  });
-};
-
-// --- APLICAR ESTADOS DE OCULTO (ADMIN) ---
-const applyHiddenStates = () => {
-  const hiddenStates = JSON.parse(localStorage.getItem('oasis-hidden-products') || '{}');
-  PRODUCTS_DATA.forEach(p => {
-    if (hiddenStates[p.name] !== undefined) {
-      p.isHidden = hiddenStates[p.name];
-    } else {
-      p.isHidden = false; // Default to not hidden
-    }
-  });
-};
+const PRODUCTS_DATA = INITIAL_PRODUCTS_DATA;
 
 // --- LÓGICA DEL CARRITO ---
 let cart = JSON.parse(localStorage.getItem('oasis-cart') || '[]');
@@ -68,9 +36,21 @@ const updateCartUI = () => {
   const cartCount = document.getElementById('cartCount');
   const cartItemsList = document.getElementById('cartItemsList');
   const cartTotalText = document.getElementById('cartTotalText');
+  const floatingCart = document.getElementById('floatingCart');
+  const floatingCartCount = document.getElementById('floatingCartCount');
 
   if (cartCount) cartCount.innerText = cart.length;
+  if (floatingCartCount) floatingCartCount.innerText = cart.length;
   
+  // Controlar visibilidad del botón flotante
+  if (floatingCart) {
+    if (cart.length > 0) {
+      floatingCart.classList.add('show');
+    } else {
+      floatingCart.classList.remove('show');
+    }
+  }
+
   if (cartItemsList) {
     cartItemsList.innerHTML = '';
     let total = 0;
@@ -80,9 +60,7 @@ const updateCartUI = () => {
       total += itemTotal;
       const itemEl = document.createElement('div');
       itemEl.className = 'cart-item';
-      const displayImg = item.image 
-        ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` 
-        : item.img;
+      const displayImg = getDisplayImageHtml(item.img, item.image, item.category, item.name);
       itemEl.innerHTML = `
         <div style="display: flex; align-items: center;">
           <div class="cart-item-img">${displayImg}</div>
@@ -111,10 +89,7 @@ const updateCartUI = () => {
 window.changeQty = (index, delta) => {
   const item = cart[index];
   const product = PRODUCTS_DATA.find(p => p.name === item.name);
-  if (!product) return showToast("Producto no encontrado en el catálogo."); // Added safety check
-  if (product.isHidden) return showToast("Este producto ya no está disponible."); // NEW: Check if product is hidden
-
-  if (delta > 0 && item.quantity >= (product?.stock || 99)) return showToast("Stock máximo alcanzado");
+  if (product && product.isHidden) return showToast("Este producto ya no está disponible.");
 
   cart[index].quantity = (cart[index].quantity || 1) + delta;
   
@@ -128,14 +103,14 @@ const updateButtonsState = () => {
   const buttons = document.querySelectorAll('.btn-agregar[data-name]');
   buttons.forEach(btn => {
     const name = btn.getAttribute('data-name');
-    const product = PRODUCTS_DATA.find(p => p.name === name); // Get product to check stock/hidden
+    const product = PRODUCTS_DATA.find(p => p.name === name);
     const isInCart = cart.some(item => item.name === name);
     
-    // If product is hidden or out of stock, disable and change text
-    if (product && (product.isHidden || product.stock <= 0)) {
+    // If product is hidden, disable and change text
+    if (product && product.isHidden) {
       btn.classList.add('disabled');
       btn.setAttribute('disabled', 'true');
-      btn.textContent = product.isHidden ? 'No disponible' : 'Sin Stock';
+      btn.textContent = 'No disponible';
     } else if (isInCart) {
       btn.classList.add('in-cart');
       btn.textContent = 'En el carrito';
@@ -165,20 +140,21 @@ const showToast = (message) => {
   setTimeout(() => toast.remove(), 3000);
 };
 
-window.addToCart = (name, price, img, image = '') => {
+window.addToCart = (name, price, img = '', image = '', category = '') => {
   const product = PRODUCTS_DATA.find(p => p.name === name);
-  if (!product) return showToast("Producto no encontrado."); // Added safety check
-  if (!product || product.stock <= 0) return showToast("Producto sin stock");
-
+  const finalCategory = category || (product ? product.category : '');
+  const finalImage = image || (product ? product.image : '');
+  const finalImg = img || (product ? product.img : '');
+  
   const existingItem = cart.find(item => item.name === name);
+  const displayEmoji = finalImg || CATEGORY_EMOJIS[finalCategory] || '🪴';
+
   if (existingItem) {
-    if (existingItem.quantity >= product.stock) return showToast("No hay más stock disponible");
-    
     existingItem.quantity = (existingItem.quantity || 1) + 1;
     showToast(`Se aumentó la cantidad de ${name}`);
   } else {
-    cart.push({ name, price, img, image, quantity: 1 });
-    showToast(`${img} ${name} añadido al carrito`);
+    cart.push({ name, price, img: finalImg, image: finalImage, quantity: 1, category: finalCategory });
+    showToast(`${displayEmoji} ${name} añadido al carrito`);
   }
   updateCartUI();
 };
@@ -202,6 +178,12 @@ window.openCartDrawer = () => {
   if (cartDrawer && cartOverlay) {
     cartDrawer.classList.add('open');
     cartOverlay.style.display = 'block';
+    
+    // Cerrar el menú hamburguesa si está abierto (móvil)
+    const navLinks = document.querySelector('.nav-links');
+    if (navLinks) {
+      navLinks.classList.remove('mobile-open');
+    }
   }
 };
 
@@ -228,6 +210,29 @@ window.sendCartWhatsApp = () => {
   window.open(`https://wa.me/5493516299530?text=${message}`, '_blank');
 };
 
+window.shareCartSocial = () => {
+  if (cart.length === 0) return showToast("El carrito está vacío.");
+  
+  let message = "¡Mira mi pedido en Oasis Vivero! 🌿\n\n";
+  cart.forEach(item => {
+    const qty = item.quantity || 1;
+    message += `• ${qty}x ${item.name}\n`;
+  });
+  const total = document.getElementById('cartTotalText')?.innerText || "";
+  message += `\nTotal estimado: ${total}`;
+
+  if (navigator.share) {
+    navigator.share({
+      title: 'Mi pedido en Oasis',
+      text: message,
+      url: window.location.href
+    }).catch(err => console.log('Error compartiendo:', err));
+  } else {
+    navigator.clipboard.writeText(message);
+    showToast("Resumen copiado al portapapeles 📋");
+  }
+};
+
 // --- LÓGICA DE RENDERIZADO DINÁMICO ---
 const renderProducts = (data) => {
   const grid = document.getElementById('mainGrid');
@@ -238,28 +243,22 @@ const renderProducts = (data) => {
 
   grid.innerHTML = visibleProducts.map(p => { // Use visibleProducts
     const isInCart = cart.some(item => item.name === p.name);
-    const isOutOfStock = p.stock <= 0;
-    const isLowStock = p.stock > 0 && p.stock < 3;
-    const displayImg = p.image 
-      ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` 
-      : p.img;
+    const displayImg = getDisplayImageHtml(p.img, p.image, p.category, p.name);
     
-    const btnText = isOutOfStock ? 'Sin Stock' : (isInCart ? 'En el carrito' : 'Añadir al carrito');
-    const btnClass = `btn-agregar ${isInCart ? 'in-cart' : ''} ${isOutOfStock ? 'disabled' : ''}`;
-    const badgeHTML = isLowStock ? `<span class="plant-badge low-stock">¡Solo quedan ${p.stock}!</span>` : '';
+    const btnText = isInCart ? 'En el carrito' : 'Añadir al carrito';
+    const btnClass = `btn-agregar ${isInCart ? 'in-cart' : ''}`;
 
     return `
     <div class="plant-card reveal active">
       <div class="plant-img ${p.bg}">
         ${displayImg}
-        ${badgeHTML}
       </div>
       <div class="plant-info">
         <div class="plant-name">${p.name}</div>
         <div class="plant-desc">${p.desc}</div>
         <div class="plant-footer">
           <span class="plant-price">$${p.price.toLocaleString()}</span>
-          <button class="${btnClass}" data-name="${p.name}" ${isOutOfStock ? 'disabled' : ''} onclick="addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}')">${btnText}</button>
+          <button class="${btnClass}" data-name="${p.name}" onclick="addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}', '${p.category}')">${btnText}</button>
         </div>
       </div>
     </div>`;
@@ -273,16 +272,19 @@ const injectSharedComponents = () => {
   // So, relative paths like "oasis.html" and "logo.png" will work directly.
   const navHTML = `
     <nav>
-      <div class="nav-logo"><a href="oasis.html" style="text-decoration:none; color:inherit;"><img src="logo.png" alt="Oasis Logo" style="height: 1.5em; vertical-align: middle; margin-right: 8px;"><span>Oasis</span></a></div>
+      <div class="nav-logo"><a href="index.html" style="text-decoration:none; color:inherit;"><img src="logo.png" alt="Oasis Logo" style="height: 1.5em; vertical-align: middle; margin-right: 8px;"><span>Oasis</span></a></div>
       <button class="menu-btn" id="menuBtn" style="display:none; background:none; border:none; font-size:1.5rem; cursor:pointer;">☰</button>
       <ul class="nav-links">
-        <li><a href="oasis.html#catalogo">Plantas</a></li>
-        <li><a href="oasis.html#servicios">Servicios</a></li>
-        <li><a href="oasis.html#nosotros">Nosotros</a></li>
-        <li><a href="oasis.html#contacto" class="nav-cta">Contactar</a></li>
+        <li><a href="index.html#catalogo">Plantas</a></li>
+        <li><a href="index.html#servicios">Servicios</a></li>
+        <li><a href="index.html#nosotros">Nosotros</a></li>
+        <li><a href="index.html#contacto" class="nav-cta">Contactar</a></li>
         <li class="nav-cart" id="openCart">
-          <span style="font-size: 1.3rem;">🛒</span>
-          <span class="cart-count" id="cartCount">0</span>
+          <div class="cart-icon-wrapper">
+            <span style="font-size: 1.3rem;">🛒</span>
+            <span class="cart-count" id="cartCount">0</span>
+          </div>
+          <span class="cart-label">Carrito</span>
         </li>
       </ul>
     </nav>`;
@@ -294,6 +296,16 @@ const injectSharedComponents = () => {
 
   if (navContainer) navContainer.innerHTML = navHTML;
   if (footContainer) footContainer.innerHTML = footerHTML;
+
+  // Inyectar botón flotante si no existe
+  if (!document.getElementById('floatingCart')) {
+    const floatBtn = document.createElement('div');
+    floatBtn.id = 'floatingCart';
+    floatBtn.className = 'floating-cart';
+    floatBtn.onclick = window.openCartDrawer;
+    floatBtn.innerHTML = `🛒 <span class="cart-count" id="floatingCartCount">0</span>`;
+    document.body.appendChild(floatBtn);
+  }
 
   // Re-vincular eventos del menú móvil después de la inyección
   const menuBtn = document.getElementById('menuBtn');
@@ -315,11 +327,6 @@ const injectSharedComponents = () => {
 document.addEventListener('DOMContentLoaded', () => {
   injectSharedComponents();
 
-  loadCustomProducts(); // Load custom products first
-  applyStockOverrides(); // Apply stock overrides
-  applyImageOverrides(); // NEW: Apply image URL overrides
-  applyEmojiOverrides(); // NEW: Apply emoji overrides
-  applyHiddenStates();   // NEW: Apply hidden states
   const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
   // Detectar categoría de la página (si existe)
@@ -377,28 +384,22 @@ document.addEventListener('DOMContentLoaded', () => {
       if (grid) {
         grid.innerHTML = filteredAndVisibleProducts.map(p => {
           const isInCart = cart.some(item => item.name === p.name);
-          const isOutOfStock = p.stock <= 0;
-          const isLowStock = p.stock > 0 && p.stock < 3;
-          const displayImg = p.image 
-            ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` 
-            : p.img;
+          const displayImg = getDisplayImageHtml(p.img, p.image, p.category, p.name);
           
-          const btnText = isOutOfStock ? 'Sin Stock' : (isInCart ? 'En el carrito' : 'Añadir al carrito');
-          const btnClass = `btn-agregar ${isInCart ? 'in-cart' : ''} ${isOutOfStock ? 'disabled' : ''}`;
-          const badgeHTML = isLowStock ? `<span class="plant-badge low-stock">¡Solo quedan ${p.stock}!</span>` : '';
+          const btnText = isInCart ? 'En el carrito' : 'Añadir al carrito';
+          const btnClass = `btn-agregar ${isInCart ? 'in-cart' : ''}`;
 
           return `
           <div class="plant-card reveal active">
             <div class="plant-img ${p.bg}">
               ${displayImg}
-              ${badgeHTML}
             </div>
             <div class="plant-info">
               <div class="plant-name">${p.name}</div>
               <div class="plant-desc">${p.desc}</div>
               <div class="plant-footer">
                 <span class="plant-price">$${p.price.toLocaleString()}</span>
-                <button class="${btnClass}" data-name="${p.name}" ${isOutOfStock ? 'disabled' : ''} onclick="addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}')">${btnText}</button>
+                <button class="${btnClass}" data-name="${p.name}" onclick="addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}', '${p.category}')">${btnText}</button>
               </div>
             </div>
           </div>`;
