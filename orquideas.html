@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body data-category="orquideas">
 
 <div id="navbar-shared"></div>
 
@@ -18,24 +18,30 @@
       <p class="section-tag">Colección</p>
       <h2 class="section-title">Orquídeas</h2>
       <p class="section-sub">La elegancia en su máxima expresión. Plantas exclusivas para regalar o decorar con distinción.</p>
-    </div>
-  </div>
-
-  <div class="cards-grid">
-    <!-- EJEMPLO ORQUÍDEA 1 -->
-    <div class="plant-card reveal active">
-      <div class="plant-img bg5">
-        🌺
-      </div>
-      <div class="plant-info">
-        <div class="plant-name">Orquídea Phalaenopsis</div>
-        <div class="plant-desc">Belleza exótica de larga floración. Un regalo inolvidable.</div>
-        <div class="plant-footer">
-          <span class="plant-price">$8.500</span>
-          <button class="btn-agregar" data-name="Orquídea Phalaenopsis" onclick="addToCart('Orquídea Phalaenopsis', 8500, '🌺', '', 'orquideas')">Añadir al carrito</button>
+      <div class="search-container">
+        <div class="search-wrapper">
+          <input type="text" id="plantSearch" class="search-input" placeholder="Buscar en orquídeas...">
+          <button id="clearSearch" class="search-clear">✕</button>
+        </div>
+        <div class="controls-row">
+          <select id="priceSort" class="sort-select">
+            <option value="default">Ordenar por</option>
+            <option value="low">Precio: Menor a Mayor</option>
+            <option value="high">Precio: Mayor a Menor</option>
+            <option value="az">Nombre: A a la Z</option>
+            <option value="za">Nombre: Z a la A</option>
+          </select>
         </div>
       </div>
     </div>
+  </div>
+
+  <div class="cards-grid" id="mainGrid">
+    <!-- Se carga dinámicamente desde script.js -->
+  </div>
+
+  <div id="noResults" style="display: none; text-align: center; padding: 4rem 2rem; color: var(--texto-suave);">
+    <p style="font-size: 1.2rem; font-family: 'Playfair Display', serif;">No se encontraron plantas que coincidan 🌱</p>
   </div>
 </section>
 
@@ -54,7 +60,6 @@
       <span id="cartTotalText">$0</span>
     </div>
     <button class="btn-primary" style="width: 100%; border: none; cursor: pointer;" onclick="sendCartWhatsApp()">Enviar pedido por WhatsApp 🌿</button>
-    <button class="btn-share" onclick="shareCartSocial()">Compartir carrito 📤</button>
     <button class="btn-clear" onclick="clearCart()">Vaciar Carrito</button>
   </div>
 </div>
