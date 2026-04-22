@@ -8,7 +8,7 @@
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="stylesheet" href="style.css">
 </head>
-<body data-category="suculentas y cactus">
+<body data-category="suculentas">
 
 <!-- Componente compartido inyectado por script.js -->
 <div id="navbar-shared"></div>
@@ -19,91 +19,33 @@
       <p class="section-tag">Nuestras Favoritas</p>
       <h2 class="section-title">Suculentas y Cactus</h2>
       <p class="section-sub">Pequeñas, resistentes y llenas de vida. Ideales para darle un toque verde a cualquier rincón de tu casa sin requerir demasiados cuidados.</p>
+      <div class="search-container">
+        <div class="search-wrapper">
+          <input type="text" id="plantSearch" class="search-input" placeholder="Buscar suculentas...">
+          <button id="clearSearch" class="search-clear">✕</button>
+        </div>
+        <div class="controls-row">
+          <select id="priceSort" class="sort-select">
+            <option value="default">Ordenar por</option>
+            <option value="low">Precio: Menor a Mayor</option>
+            <option value="high">Precio: Mayor a Menor</option>
+            <option value="az">Nombre: A a la Z</option>
+            <option value="za">Nombre: Z a la A</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <a href="ver-todo.html" class="btn-secondary">← Volver al catálogo</a>
   </div>
 
   <!-- Aquí es donde script.js dibujará las TARJETAS de las suculentas automáticamente -->
   <div class="cards-grid" id="mainGrid">
     
     <!-- EJEMPLO DE TARJETA MANUAL (Copia y pega este bloque para agregar más) -->
-    <div class="plant-card reveal active">
-      <!-- Cambia bg2 por bg1, bg3, bg4, bg5 o bg6 para cambiar el color de fondo -->
-      <div class="plant-img bg2">
-        <!-- style="object-position: top;" enfoca la parte superior, ocultando la maceta de abajo -->
-        <img src="./imgs/suculentas/moneymaker.jpeg" alt="Money Maker Variegada" loading="lazy" decoding="async" style="object-position: center;">
-        <span class="plant-size-badge">n° 12</span>
-      </div>
-      <div class="plant-info">
-        <div class="plant-name">Money Maker Variegada</div>
-        <div class="plant-footer">
-          <span class="plant-price">$1.500</span>
-          <button class="btn-agregar">
-            Añadir al carrito
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="plant-card reveal active">
-      <!-- Cambia bg2 por bg1, bg3, bg4, bg5 o bg6 para cambiar el color de fondo -->
-      <div class="plant-img bg2">
-        <img src="./imgs/suculentas/jade.png" alt="Árbol de Jade" loading="lazy" decoding="async">
-      </div>
-      <div class="plant-info">
-        <div class="plant-name">Árbol de Jade</div>
-        <div class="size-selector">
-          <label class="size-option" title="Tamaño N12">
-            <input type="radio" name="size-jade" value="N12" checked>
-            <span class="size-bg">N12</span>
-          </label>
-          <label class="size-option" title="Tamaño N14">
-            <input type="radio" name="size-jade" value="N14">
-            <span class="size-bg">N14</span>
-          </label>
-        </div>
-        <div class="plant-footer">
-          <span class="plant-price">$3.000</span>
-          <button class="btn-agregar">
-            Añadir al carrito
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="plant-card reveal active">
-      <div class="plant-img bg2">
-        <img src="./imgs/suculentas/crassula muscosa.png" alt="Crassula Muscosa" loading="lazy" decoding="async">
-        <span class="plant-size-badge">n° 12</span>
-      </div>
-      <div class="plant-info">
-        <div class="plant-name">Crassula Muscosa</div>
-        <div class="plant-footer">
-          <span class="plant-price">$3.000</span>
-          <button class="btn-agregar">
-            Añadir al carrito
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <div class="plant-card reveal active">
-      <div class="plant-img bg2">
-        <img src="./imgs/suculentas/graptosedum.png" alt="Graptosedum" loading="lazy" decoding="async">
-        <span class="plant-size-badge">n° 12</span>
-      </div>
-      <div class="plant-info">
-        <div class="plant-name">Graptosedum</div>
-        <div class="plant-footer">
-          <span class="plant-price">$2.000</span>
-          <button class="btn-agregar">
-            Añadir al carrito
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 
+  <div id="noResults" style="display: none; text-align: center; padding: 4rem 2rem; color: var(--texto-suave);">
+    <p style="font-size: 1.2rem; font-family: 'Playfair Display', serif;">No se encontraron suculentas que coincidan 🌱</p>
+  </div>
 
 </section>
 
@@ -125,6 +67,7 @@
   </div>
 </div>
 
+<script src="data.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
