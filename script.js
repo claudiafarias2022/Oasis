@@ -7,7 +7,7 @@ const PRODUCTS_DATA = [
   { name: 'Dolar Negro', price: 2500, img: '🪴', image: './imgs/ornamentales/dolarnegro.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Dolar Variegado', price: 2500, img: '🪴', image: './imgs/ornamentales/dolarvariegado.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Espada de San Jorge Mini', price: 2500, img: '🪴', image: './imgs/ornamentales/espadadesanjorgemini.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
-  { name: 'Kalanchoe Blossfeldiana Amarilla', price: 2000, img: '🪴', image: './imgs/ornamentales/kalanchoeblossfeldiana.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
+  { name: 'Kalanchoe Blossfeldiana', price: 2000, img: '🪴', image: './imgs/ornamentales/kalanchoeblossfeldiana.png', desc: '', bg: 'bg6', category: 'interior', stock: 10, colors: ['Amarilla', 'Roja', 'Rosa'] },
   { name: 'Ledebouria Socialis', price: 3000, img: '🪴', image: './imgs/ornamentales/ledebouriasocialis.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Senecio angulatus', price: 2000, img: '🪴', image: './imgs/ornamentales/Senecio angulatus.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Tradescantia Fluminensis Variegata', price: 1500, img: '🪴', image: './imgs/ornamentales/tradescantiafluminensisvariegata.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
@@ -48,13 +48,17 @@ const updateCartUI = () => {
       const itemEl = document.createElement('div');
       itemEl.className = 'cart-item';
       const displayImg = item.image 
-        ? `<img src="${item.image}" alt="${item.name}" loading="lazy">` 
+        ? `<img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async">` 
         : item.img;
+      
+      const colorText = item.color ? `<span style="font-size:0.85em; color:var(--texto-suave); display:block; margin-top:2px;">Color: ${item.color}</span>` : '';
+
       itemEl.innerHTML = `
         <div style="display: flex; align-items: center;">
           <div class="cart-item-img">${displayImg}</div>
           <div class="cart-item-info">
             <h4>${item.name}</h4>
+            ${colorText}
             <p>$${item.price.toLocaleString('es-AR')}</p>
             <div class="qty-controls">
               <button class="btn-qty" onclick="changeQty(${index}, -1)" aria-label="Disminuir">-</button>
@@ -133,21 +137,21 @@ const showToast = (message) => {
   setTimeout(() => toast.remove(), 3000);
 };
 
-window.addToCart = (name, price, img, image = '') => {
+window.addToCart = (name, price, img, image = '', color = '') => {
   const product = PRODUCTS_DATA.find(p => p.name === name);
   
   if (product && product.stock <= 0) return showToast("Producto sin stock");
 
-  const existingItem = cart.find(item => item.name === name);
+  const existingItem = cart.find(item => item.name === name && (item.color || '') === color);
   if (existingItem) {
     const maxStock = product ? product.stock : 99;
     if (existingItem.quantity >= maxStock) return showToast("No hay más stock disponible");
     
     existingItem.quantity = (existingItem.quantity || 1) + 1;
-    showToast(`Se aumentó la cantidad de ${name}`);
+    showToast(`Se aumentó la cantidad de ${name}${color ? ' ('+color+')' : ''}`);
   } else {
-    cart.push({ name, price, img, image, quantity: 1 });
-    showToast(`${img} ${name} añadido al carrito`);
+    cart.push({ name, price, img, image, quantity: 1, color });
+    showToast(`${img} ${name}${color ? ' ('+color+')' : ''} añadido al carrito`);
   }
   updateCartUI();
 };
@@ -191,7 +195,8 @@ window.sendCartWhatsApp = () => {
   cart.forEach(item => {
     const qty = item.quantity || 1;
     const subtotal = item.price * qty;
-    message += `• ${qty}x ${item.img} ${item.name} ($${subtotal.toLocaleString('es-AR')})%0A`;
+    const colorStr = item.color ? ` (Color: ${item.color})` : '';
+    message += `• ${qty}x ${item.img} ${item.name}${colorStr} ($${subtotal.toLocaleString('es-AR')})%0A`;
   });
   const total = cartTotalText ? cartTotalText.innerText : "";
   message += `%0A*Total: ${total}*`;
@@ -211,12 +216,28 @@ const renderProducts = (data) => {
     const isOutOfStock = p.stock <= 0;
     const isLowStock = p.stock > 0 && p.stock < 3;
     const displayImg = p.image 
-      ? `<img src="${p.image}" alt="${p.name}" loading="lazy">` 
+      ? `<img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">` 
       : p.img;
     
     const btnText = isOutOfStock ? 'Sin Stock' : (isInCart ? 'En el carrito' : 'Añadir al carrito');
     const btnClass = `btn-agregar ${isInCart ? 'in-cart' : ''} ${isOutOfStock ? 'disabled' : ''}`;
     const badgeHTML = isLowStock ? `<span class="plant-badge low-stock">¡Solo quedan ${p.stock}!</span>` : '';
+
+    // Diccionario de colores. Si en el futuro agregas "Blanca", puedes sumar 'Blanca': '#FFFFFF' aquí.
+    const colorMap = {
+      'Amarilla': '#FFD700',
+      'Roja': '#E63946',
+      'Rosa': '#FFB5A7'
+    };
+    const getColorHex = (name) => colorMap[name] || '#cccccc';
+
+    const colorSelectHTML = p.colors && p.colors.length > 0
+      ? `<div class="color-selector" id="color-${p.name.replace(/\s+/g, '-')}">
+           ${p.colors.map((c, i) => `
+             <label class="color-swatch" title="${c}"><input type="radio" name="color-${p.name.replace(/\s+/g, '-')}" value="${c}" ${i === 0 ? 'checked' : ''}><span class="swatch-bg" style="background-color: ${getColorHex(c)};"></span></label>
+           `).join('')}
+         </div>`
+      : '';
 
     return `
     <div class="plant-card reveal active">
@@ -226,9 +247,10 @@ const renderProducts = (data) => {
       </div>
       <div class="plant-info">
         <div class="plant-name">${p.name}</div>
+        ${colorSelectHTML}
         <div class="plant-footer">
           <span class="plant-price">$${p.price.toLocaleString('es-AR')}</span>
-          <button class="${btnClass}" data-name="${p.name}" ${isOutOfStock ? 'disabled' : ''} onclick="addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}')">${btnText}</button>
+          <button class="${btnClass}" data-name="${p.name}" ${isOutOfStock ? 'disabled' : ''} onclick="const card = this.closest('.plant-card'); const col = card.querySelector('input[type=radio]:checked'); addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}', col ? col.value : '')">${btnText}</button>
         </div>
       </div>
     </div>`;
@@ -344,7 +366,11 @@ document.addEventListener('DOMContentLoaded', () => {
       
       if (product) {
         btn.setAttribute('data-name', product.name);
-        btn.onclick = () => addToCart(product.name, product.price, product.img, product.image || '');
+        btn.onclick = () => {
+          const colorInput = card.querySelector('input[type="radio"]:checked');
+          const color = colorInput ? colorInput.value : '';
+          addToCart(product.name, product.price, product.img, product.image || '', color);
+        };
       }
     }
   });
