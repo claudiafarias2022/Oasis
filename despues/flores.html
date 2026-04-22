@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plantas de Interior — Oasis Vivero</title>
+<title>Flores — Oasis Vivero</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="stylesheet" href="style.css">
 </head>
-<body data-category="interior">
+<body data-category="orquideas">
 
 <div id="navbar-shared"></div>
 
@@ -16,11 +16,11 @@
   <div class="catalogo-header">
     <div>
       <p class="section-tag">Colección</p>
-      <h2 class="section-title">Plantas de Interior</h2>
-      <p class="section-sub">Dale vida y aire puro a tus ambientes cerrados con nuestras variedades seleccionadas.</p>
+      <h2 class="section-title">Flores</h2>
+      <p class="section-sub">La elegancia en su máxima expresión. Plantas exclusivas para regalar o decorar con distinción.</p>
       <div class="search-container">
         <div class="search-wrapper">
-          <input type="text" id="plantSearch" class="search-input" placeholder="Buscar plantas de interior...">
+          <input type="text" id="plantSearch" class="search-input" placeholder="Buscar en Flores...">
           <button id="clearSearch" class="search-clear">✕</button>
         </div>
         <div class="controls-row">
@@ -37,7 +37,23 @@
   </div>
 
   <div class="cards-grid" id="mainGrid">
-    <!-- Se carga dinámicamente desde script.js -->
+    
+            <div class="plant-card reveal active">
+      <div class="plant-img bg6">
+        <img src="./imgs/ornamentales/nose.png" alt="Tradescantia Fluminensis Variegata" loading="lazy">
+      </div>
+      <div class="plant-info">
+        <div class="plant-name"></div>
+        <div class="plant-footer">
+          <span class="plant-price">$2.000</span>
+          <button class="btn-agregar">
+            Añadir al carrito
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   </div>
 
   <div id="noResults" style="display: none; text-align: center; padding: 4rem 2rem; color: var(--texto-suave);">
