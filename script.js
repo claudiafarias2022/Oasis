@@ -1,5 +1,5 @@
 const PRODUCTS_DATA = [
-  { name: 'Árbol de Jade', price: 3000, img: '🌸', image: './imgs/suculentas/jade.png', desc: '', bg: 'bg2', category: 'suculentas', stock: 10 },
+  { name: 'Árbol de Jade', price: 3000, img: '🌸', image: './imgs/suculentas/jade.png', desc: '', bg: 'bg2', category: 'suculentas', stock: 10, sizes: ['N12', 'N14'], sizePrices: {'N12': 3000, 'N14': 4500}, sizeImages: {'N12': './imgs/suculentas/jade.png', 'N14': './imgs/suculentas/jade_grande.png'} },
   { name: 'Bromelia', price: 3000, img: '🪴', image: './imgs/ornamentales/bromelia.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Callisia Repens', price: 2500, img: '🪴', image: './imgs/ornamentales/callisiarepens.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Cretona', price: 2000, img: '🪴', image: './imgs/ornamentales/cretona.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
@@ -7,12 +7,12 @@ const PRODUCTS_DATA = [
   { name: 'Dolar Negro', price: 2500, img: '🪴', image: './imgs/ornamentales/dolarnegro.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Dolar Variegado', price: 2500, img: '🪴', image: './imgs/ornamentales/dolarvariegado.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Espada de San Jorge Mini', price: 2500, img: '🪴', image: './imgs/ornamentales/espadadesanjorgemini.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
-  { name: 'Kalanchoe Blossfeldiana', price: 2000, img: '🪴', image: './imgs/ornamentales/kalanchoeblossfeldiana.png', desc: '', bg: 'bg6', category: 'interior', stock: 10, colors: ['Amarilla', 'Roja', 'Rosa'] },
+  { name: 'Kalanchoe Blossfeldiana', price: 2000, img: '🪴', image: './imgs/ornamentales/kalanchoeblossfeldiana.png', desc: '', bg: 'bg6', category: 'interior', stock: 10, colors: ['Amarilla', 'Roja', 'Rosa'], colorImages: { 'Amarilla': './imgs/ornamentales/kalanchoeblossfeldiana.png', 'Roja': './imgs/ornamentales/kalanchoe_roja.png', 'Rosa': './imgs/ornamentales/kalanchoe_rosa.png' } },
   { name: 'Ledebouria Socialis', price: 3000, img: '🪴', image: './imgs/ornamentales/ledebouriasocialis.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Senecio angulatus', price: 2000, img: '🪴', image: './imgs/ornamentales/Senecio angulatus.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Tradescantia Fluminensis Variegata', price: 1500, img: '🪴', image: './imgs/ornamentales/tradescantiafluminensisvariegata.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
   { name: 'Nose', price: 2000, img: '🪴', image: './imgs/ornamentales/nose.png', desc: '', bg: 'bg6', category: 'interior', stock: 10 },
-  { name: 'Money Maker Variegada', price: 1500, img: '🌸', image: './imgs/suculentas/moneymaker.jpeg', desc: '', bg: 'bg2', category: 'suculentas', stock: 10 },
+  { name: 'Money Maker Variegada', price: 1500, img: '🌸', image: './imgs/suculentas/moneymaker.jpeg', desc: '', bg: 'bg2', category: 'suculentas', stock: 10, imgPos: 'top' },
   { name: 'Crassula Muscosa', price: 3000, img: '🪴', image: './imgs/suculentas/crassula muscosa.png', desc: '', bg: 'bg2', category: 'suculentas', stock: 5 },
   { name: 'Graptosedum', price: 2000, img: '🌸', image: './imgs/suculentas/graptosedum.png', desc: '', bg: 'bg2', category: 'suculentas', stock: 5 }
 ];
@@ -48,10 +48,11 @@ const updateCartUI = () => {
       const itemEl = document.createElement('div');
       itemEl.className = 'cart-item';
       const displayImg = item.image 
-        ? `<img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async">` 
+        ? `<img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" ${item.imgPos ? `style="object-position: ${item.imgPos};"` : ''}>` 
         : item.img;
       
       const colorText = item.color ? `<span style="font-size:0.85em; color:var(--texto-suave); display:block; margin-top:2px;">Color: ${item.color}</span>` : '';
+      const sizeText = item.size ? `<span style="font-size:0.85em; color:var(--texto-suave); display:block; margin-top:2px;">Tamaño: ${item.size}</span>` : '';
 
       itemEl.innerHTML = `
         <div style="display: flex; align-items: center;">
@@ -59,6 +60,7 @@ const updateCartUI = () => {
           <div class="cart-item-info">
             <h4>${item.name}</h4>
             ${colorText}
+            ${sizeText}
             <p>$${item.price.toLocaleString('es-AR')}</p>
             <div class="qty-controls">
               <button class="btn-qty" onclick="changeQty(${index}, -1)" aria-label="Disminuir">-</button>
@@ -137,21 +139,35 @@ const showToast = (message) => {
   setTimeout(() => toast.remove(), 3000);
 };
 
-window.addToCart = (name, price, img, image = '', color = '') => {
+window.addToCart = (name, price, img, image = '', color = '', size = '') => {
   const product = PRODUCTS_DATA.find(p => p.name === name);
   
   if (product && product.stock <= 0) return showToast("Producto sin stock");
 
-  const existingItem = cart.find(item => item.name === name && (item.color || '') === color);
+  // Calcular el precio real si se seleccionó un tamaño especial
+  let finalPrice = price;
+  if (size && product && product.sizePrices && product.sizePrices[size]) {
+    finalPrice = product.sizePrices[size];
+  }
+
+  // Calcular la imagen real si se seleccionó un color o tamaño con imagen específica
+  let finalImage = image;
+  if (color && product && product.colorImages && product.colorImages[color]) {
+    finalImage = product.colorImages[color];
+  } else if (size && product && product.sizeImages && product.sizeImages[size]) {
+    finalImage = product.sizeImages[size];
+  }
+
+  const existingItem = cart.find(item => item.name === name && (item.color || '') === color && (item.size || '') === size);
   if (existingItem) {
     const maxStock = product ? product.stock : 99;
     if (existingItem.quantity >= maxStock) return showToast("No hay más stock disponible");
     
     existingItem.quantity = (existingItem.quantity || 1) + 1;
-    showToast(`Se aumentó la cantidad de ${name}${color ? ' ('+color+')' : ''}`);
+    showToast(`Se aumentó la cantidad de ${name}${color ? ' ('+color+')' : ''}${size ? ' ('+size+')' : ''}`);
   } else {
-    cart.push({ name, price, img, image, quantity: 1, color });
-    showToast(`${img} ${name}${color ? ' ('+color+')' : ''} añadido al carrito`);
+    cart.push({ name, price: finalPrice, img, image: finalImage, quantity: 1, color, size, imgPos: product ? product.imgPos : '' });
+    showToast(`${img} ${name}${color ? ' ('+color+')' : ''}${size ? ' ('+size+')' : ''} añadido al carrito`);
   }
   updateCartUI();
 };
@@ -191,15 +207,46 @@ window.sendCartWhatsApp = () => {
   const cartTotalText = document.getElementById('cartTotalText');
   if (cart.length === 0) return alert("El carrito está vacío.");
   
-  let message = "¡Hola Oasis! Me gustaría encargar las siguientes plantas:%0A%0A";
+  const customerNameEl = document.getElementById('customerName');
+  const customerName = customerNameEl ? customerNameEl.value.trim() : '';
+  
+  if (customerNameEl && !customerName) {
+    return alert("Por favor, ingresá tu nombre para que podamos agendar tu pedido.");
+  }
+
+  const methodSelect = document.getElementById('shippingMethod');
+  let shippingStr = "";
+  if (methodSelect) {
+    const methodVal = methodSelect.value;
+    const methodText = methodSelect.options[methodSelect.selectedIndex].text;
+    shippingStr += `%0A%0A*Entrega:* ${methodText}`;
+    
+    if (methodVal.includes('Envío')) {
+      const address = document.getElementById('shippingAddress') ? document.getElementById('shippingAddress').value.trim() : '';
+      const city = document.getElementById('shippingCity') ? document.getElementById('shippingCity').value.trim() : '';
+      const zip = document.getElementById('shippingZip') ? document.getElementById('shippingZip').value.trim() : '';
+      
+      if (!address || !city || !zip) {
+        return alert("Por favor, completá los datos de envío (Dirección, Ciudad/Provincia y Código Postal) para que podamos cotizarlo.");
+      }
+      if (zip.length < 4) {
+        return alert("El Código Postal debe tener al menos 4 números. Por favor, revisalo.");
+      }
+      shippingStr += `%0A*Dirección:* ${address}, ${city} (CP: ${zip})`;
+    }
+  }
+
+  let message = `¡Hola Oasis! Soy *${customerName}* y me gustaría encargar las siguientes plantas:%0A%0A`;
   cart.forEach(item => {
     const qty = item.quantity || 1;
     const subtotal = item.price * qty;
     const colorStr = item.color ? ` (Color: ${item.color})` : '';
-    message += `• ${qty}x ${item.img} ${item.name}${colorStr} ($${subtotal.toLocaleString('es-AR')})%0A`;
+    const sizeStr = item.size ? ` (Tamaño: ${item.size})` : '';
+    message += `• ${qty}x ${item.img} ${item.name}${colorStr}${sizeStr} ($${subtotal.toLocaleString('es-AR')})%0A`;
   });
   const total = cartTotalText ? cartTotalText.innerText : "";
-  message += `%0A*Total: ${total}*`;
+  message += `%0A*Total en plantas: ${total}*`;
+  message += shippingStr;
   window.open(`https://wa.me/5493516299530?text=${message}`, '_blank');
 };
 
@@ -216,12 +263,29 @@ const renderProducts = (data) => {
     const isOutOfStock = p.stock <= 0;
     const isLowStock = p.stock > 0 && p.stock < 3;
     const displayImg = p.image 
-      ? `<img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async">` 
+      ? `<img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async" ${p.imgPos ? `style="object-position: ${p.imgPos};"` : ''}>` 
       : p.img;
     
     const btnText = isOutOfStock ? 'Sin Stock' : (isInCart ? 'En el carrito' : 'Añadir al carrito');
     const btnClass = `btn-agregar ${isInCart ? 'in-cart' : ''} ${isOutOfStock ? 'disabled' : ''}`;
     const badgeHTML = isLowStock ? `<span class="plant-badge low-stock">¡Solo quedan ${p.stock}!</span>` : '';
+
+    const plantSizes = p.sizes && p.sizes.length > 0 ? p.sizes : ['n° 12'];
+    const singleSize = plantSizes.length === 1 ? plantSizes[0] : '';
+    const multiSize = plantSizes.length > 1;
+
+    const plantColors = p.colors || [];
+    const singleColor = plantColors.length === 1 ? plantColors[0] : '';
+    const multiColor = plantColors.length > 1;
+
+    let inlineBadges = '';
+    if (singleColor) inlineBadges += `<span class="plant-inline-badge">${singleColor}</span>`;
+    
+    const nameHTML = inlineBadges 
+      ? `<div class="plant-name-container"><div class="plant-name" style="margin-bottom:0;">${p.name}</div><div class="plant-badges">${inlineBadges}</div></div>`
+      : `<div class="plant-name">${p.name}</div>`;
+
+    const sizeBadgeHTML = singleSize ? `<span class="plant-size-badge">${singleSize}</span>` : '';
 
     // Diccionario de colores. Si en el futuro agregas "Blanca", puedes sumar 'Blanca': '#FFFFFF' aquí.
     const colorMap = {
@@ -231,26 +295,43 @@ const renderProducts = (data) => {
     };
     const getColorHex = (name) => colorMap[name] || '#cccccc';
 
-    const colorSelectHTML = p.colors && p.colors.length > 0
+    const colorSelectHTML = multiColor
       ? `<div class="color-selector" id="color-${p.name.replace(/\s+/g, '-')}">
-           ${p.colors.map((c, i) => `
+           ${plantColors.map((c, i) => `
              <label class="color-swatch" title="${c}"><input type="radio" name="color-${p.name.replace(/\s+/g, '-')}" value="${c}" ${i === 0 ? 'checked' : ''}><span class="swatch-bg" style="background-color: ${getColorHex(c)};"></span></label>
            `).join('')}
          </div>`
       : '';
+
+    const sizeSelectHTML = multiSize
+      ? `<div class="size-selector" id="size-${p.name.replace(/\s+/g, '-')}">
+           ${plantSizes.map((s, i) => `
+             <label class="size-option" title="Tamaño ${s}"><input type="radio" name="size-${p.name.replace(/\s+/g, '-')}" value="${s}" ${i === 0 ? 'checked' : ''}><span class="size-bg">${s}</span></label>
+           `).join('')}
+         </div>`
+      : '';
+
+    let displayPrice = p.price;
+    if (multiSize && p.sizePrices && p.sizePrices[plantSizes[0]]) {
+      displayPrice = p.sizePrices[plantSizes[0]];
+    } else if (singleSize && p.sizePrices && p.sizePrices[singleSize]) {
+      displayPrice = p.sizePrices[singleSize];
+    }
 
     return `
     <div class="plant-card reveal active">
       <div class="plant-img ${p.bg}">
         ${displayImg}
         ${badgeHTML}
+        ${sizeBadgeHTML}
       </div>
       <div class="plant-info">
-        <div class="plant-name">${p.name}</div>
+        ${nameHTML}
         ${colorSelectHTML}
+        ${sizeSelectHTML}
         <div class="plant-footer">
-          <span class="plant-price">$${p.price.toLocaleString('es-AR')}</span>
-          <button class="${btnClass}" data-name="${p.name}" ${isOutOfStock ? 'disabled' : ''} onclick="const card = this.closest('.plant-card'); const col = card.querySelector('input[type=radio]:checked'); addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}', col ? col.value : '')">${btnText}</button>
+          <span class="plant-price">$${displayPrice.toLocaleString('es-AR')}</span>
+          <button class="${btnClass}" data-name="${p.name}" ${isOutOfStock ? 'disabled' : ''} onclick="const card = this.closest('.plant-card'); const col = card.querySelector('.color-swatch input[type=radio]:checked'); const sz = card.querySelector('.size-option input[type=radio]:checked'); addToCart('${p.name}', ${p.price}, '${p.img}', '${p.image || ''}', col ? col.value : '${singleColor}', sz ? sz.value : '${singleSize}')">${btnText}</button>
         </div>
       </div>
     </div>`;
@@ -319,6 +400,30 @@ const injectSharedComponents = () => {
     document.body.insertAdjacentHTML('beforeend', imageModalHTML);
   }
 
+  // Inyectar opciones de envío en el footer del carrito
+  const cartFooter = document.querySelector('.cart-footer');
+  if (cartFooter && !document.getElementById('shippingMethod')) {
+    const shippingHTML = `
+      <div class="cart-shipping" style="margin-bottom: 1.5rem; text-align: left; border-bottom: 1px solid var(--crema-oscura); padding-bottom: 1rem;">
+        <label for="customerName" style="font-size: 0.9rem; font-weight: 600; color: var(--verde-oscuro); display: block; margin-bottom: 0.5rem;">Tus datos:</label>
+        <input type="text" id="customerName" placeholder="Nombre y Apellido" style="width: 100%; padding: 0.6rem; border-radius: 0.5rem; border: 1px solid var(--crema-oscura); font-family: inherit; margin-bottom: 1rem; background: white; color: var(--texto);">
+        
+        <label for="shippingMethod" style="font-size: 0.9rem; font-weight: 600; color: var(--verde-oscuro); display: block; margin-bottom: 0.5rem;">Método de entrega:</label>
+        <select id="shippingMethod" onchange="toggleAddress(); updateCartUI();" style="width: 100%; padding: 0.6rem; border-radius: 0.5rem; border: 1px solid var(--crema-oscura); font-family: inherit; margin-bottom: 0.5rem; background: white; color: var(--texto);">
+          <option value="0|Retiro en Vivero">Retiro en Vivero (Gratis)</option>
+          <option value="0|Envío por Correo Argentino / Andreani">Envío por Correo (A cotizar por WhatsApp)</option>
+          <option value="0|Envío por cadetería (Córdoba Capital)">Envío en Córdoba Capital (A cotizar por WhatsApp)</option>
+        </select>
+        <div id="addressFields" style="display: none; gap: 0.5rem; flex-direction: column;">
+          <input type="text" id="shippingAddress" placeholder="Dirección, piso, depto, barrio..." style="width: 100%; padding: 0.6rem; border-radius: 0.5rem; border: 1px solid var(--crema-oscura); font-family: inherit; background: white; color: var(--texto);">
+          <input type="text" id="shippingCity" placeholder="Ciudad y Provincia (Ej: Carlos Paz, Córdoba)" style="width: 100%; padding: 0.6rem; border-radius: 0.5rem; border: 1px solid var(--crema-oscura); font-family: inherit; background: white; color: var(--texto);">
+          <input type="number" id="shippingZip" placeholder="Código Postal (Ej: 5000)" style="width: 100%; padding: 0.6rem; border-radius: 0.5rem; border: 1px solid var(--crema-oscura); font-family: inherit; background: white; color: var(--texto);">
+        </div>
+      </div>
+    `;
+    cartFooter.insertAdjacentHTML('afterbegin', shippingHTML);
+  }
+
   // Re-vincular eventos del menú móvil después de la inyección
   const menuBtn = document.getElementById('menuBtn');
   const navLinks = document.querySelector('.nav-links');
@@ -335,6 +440,19 @@ const injectSharedComponents = () => {
   if (closeCartBtn) closeCartBtn.onclick = window.closeCartDrawer;
   if (cartOverlay) cartOverlay.onclick = window.closeCartDrawer;
   if (floatingCartBtn) floatingCartBtn.onclick = window.openCartDrawer;
+};
+
+window.toggleAddress = () => {
+  const method = document.getElementById('shippingMethod').value;
+  const addressFields = document.getElementById('addressFields');
+  if (method.includes('Envío')) {
+    addressFields.style.display = 'flex';
+  } else {
+    addressFields.style.display = 'none';
+    document.getElementById('shippingAddress').value = '';
+    if(document.getElementById('shippingCity')) document.getElementById('shippingCity').value = '';
+    if(document.getElementById('shippingZip')) document.getElementById('shippingZip').value = '';
+  }
 };
 
 // --- INICIALIZACIÓN GENERAL ---
@@ -354,6 +472,55 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!pageCategory) {
     renderProducts(currentProducts);
   }
+
+  // --- CAMBIO DE IMAGEN AL SELECCIONAR COLOR ---
+  document.addEventListener('change', (e) => {
+    if (e.target.matches('.color-swatch input[type="radio"]')) {
+      const card = e.target.closest('.plant-card');
+      if (!card) return;
+      const imgEl = card.querySelector('.plant-img img');
+      const nameEl = card.querySelector('.plant-name');
+      if (imgEl && nameEl) {
+        const plantName = nameEl.innerText.trim();
+        const product = PRODUCTS_DATA.find(p => p.name === plantName);
+        if (product && product.colorImages && product.colorImages[e.target.value]) {
+          imgEl.style.opacity = 0; // Ocultamos la imagen un instante
+          setTimeout(() => {
+            imgEl.src = product.colorImages[e.target.value]; // Cambiamos la fuente
+            imgEl.style.opacity = 1; // La volvemos a mostrar
+          }, 200);
+        }
+      }
+    }
+
+    // --- CAMBIO DE PRECIO Y FOTO AL SELECCIONAR TAMAÑO ---
+    if (e.target.matches('.size-option input[type="radio"]')) {
+      const card = e.target.closest('.plant-card');
+      if (!card) return;
+      const nameEl = card.querySelector('.plant-name');
+      const priceEl = card.querySelector('.plant-price');
+      const imgEl = card.querySelector('.plant-img img');
+      
+      if (nameEl) {
+        const plantName = nameEl.innerText.trim();
+        const product = PRODUCTS_DATA.find(p => p.name === plantName);
+        if (product) {
+          // Cambiar precio
+          if (priceEl && product.sizePrices && product.sizePrices[e.target.value]) {
+            priceEl.innerText = '$' + product.sizePrices[e.target.value].toLocaleString('es-AR');
+          }
+          // Cambiar imagen si existe la configuración sizeImages
+          if (imgEl && product.sizeImages && product.sizeImages[e.target.value]) {
+            imgEl.style.opacity = 0; // Efecto de desvanecimiento
+            setTimeout(() => {
+              imgEl.src = product.sizeImages[e.target.value];
+              imgEl.style.opacity = 1;
+            }, 200);
+          }
+        }
+      }
+    }
+  });
   
   // --- AUTO-VINCULAR BOTONES DE TARJETAS MANUALES ---
   document.querySelectorAll('.plant-card').forEach(card => {
@@ -367,9 +534,15 @@ document.addEventListener('DOMContentLoaded', () => {
       if (product) {
         btn.setAttribute('data-name', product.name);
         btn.onclick = () => {
-          const colorInput = card.querySelector('input[type="radio"]:checked');
-          const color = colorInput ? colorInput.value : '';
-          addToCart(product.name, product.price, product.img, product.image || '', color);
+          const plantSizes = product.sizes && product.sizes.length > 0 ? product.sizes : ['n° 12'];
+          const singleSize = plantSizes.length === 1 ? plantSizes[0] : '';
+          const singleColor = product.colors && product.colors.length === 1 ? product.colors[0] : '';
+
+          const colorInput = card.querySelector('.color-swatch input[type="radio"]:checked');
+          const color = colorInput ? colorInput.value : singleColor;
+          const sizeInput = card.querySelector('.size-option input[type="radio"]:checked');
+          const size = sizeInput ? sizeInput.value : singleSize;
+          addToCart(product.name, product.price, product.img, product.image || '', color, size);
         };
       }
     }

@@ -30,7 +30,9 @@
     <div class="plant-card reveal active">
       <!-- Cambia bg2 por bg1, bg3, bg4, bg5 o bg6 para cambiar el color de fondo -->
       <div class="plant-img bg2">
-        <img src="./imgs/suculentas/moneymaker.jpeg" alt="Money Maker Variegada" loading="lazy" decoding="async">
+        <!-- style="object-position: top;" enfoca la parte superior, ocultando la maceta de abajo -->
+        <img src="./imgs/suculentas/moneymaker.jpeg" alt="Money Maker Variegada" loading="lazy" decoding="async" style="object-position: center;">
+        <span class="plant-size-badge">n° 12</span>
       </div>
       <div class="plant-info">
         <div class="plant-name">Money Maker Variegada</div>
@@ -50,6 +52,16 @@
       </div>
       <div class="plant-info">
         <div class="plant-name">Árbol de Jade</div>
+        <div class="size-selector">
+          <label class="size-option" title="Tamaño N12">
+            <input type="radio" name="size-jade" value="N12" checked>
+            <span class="size-bg">N12</span>
+          </label>
+          <label class="size-option" title="Tamaño N14">
+            <input type="radio" name="size-jade" value="N14">
+            <span class="size-bg">N14</span>
+          </label>
+        </div>
         <div class="plant-footer">
           <span class="plant-price">$3.000</span>
           <button class="btn-agregar">
@@ -62,6 +74,7 @@
     <div class="plant-card reveal active">
       <div class="plant-img bg2">
         <img src="./imgs/suculentas/crassula muscosa.png" alt="Crassula Muscosa" loading="lazy" decoding="async">
+        <span class="plant-size-badge">n° 12</span>
       </div>
       <div class="plant-info">
         <div class="plant-name">Crassula Muscosa</div>
@@ -77,6 +90,7 @@
     <div class="plant-card reveal active">
       <div class="plant-img bg2">
         <img src="./imgs/suculentas/graptosedum.png" alt="Graptosedum" loading="lazy" decoding="async">
+        <span class="plant-size-badge">n° 12</span>
       </div>
       <div class="plant-info">
         <div class="plant-name">Graptosedum</div>
