@@ -81,7 +81,20 @@ const updateButtonsState = () => {
   buttons.forEach(btn => {
     const name = btn.getAttribute('data-name');
     const product = PRODUCTS_DATA.find(p => p.name === name);
-    const isInCart = cart.some(item => item.name === name);
+    
+    // Buscar qué opciones están marcadas en la tarjeta de esta planta
+    let selectedColor = '';
+    let selectedSize = '';
+    const card = btn.closest('.plant-card');
+    if (card) {
+      const colorInput = card.querySelector('.color-swatch input[type="radio"]:checked');
+      const sizeInput = card.querySelector('.size-option input[type="radio"]:checked');
+      selectedColor = colorInput ? colorInput.value : (product.colors?.length === 1 ? product.colors[0] : '');
+      selectedSize = sizeInput ? sizeInput.value : (product.sizes?.length === 1 ? product.sizes[0] : '');
+    }
+
+    // Verificar si esta combinación exacta (Nombre + Color + Tamaño) está en el carrito
+    const isInCart = cart.some(item => item.name === name && (item.color || '') === selectedColor && (item.size || '') === selectedSize);
     
     if (product && product.isHidden) {
       btn.classList.add('disabled');
@@ -246,7 +259,18 @@ const renderProducts = (data) => {
   const visibleProducts = data.filter(p => !p.isHidden); // NEW LINE
 
   grid.innerHTML = visibleProducts.map(p => { // Use visibleProducts
-    const isInCart = cart.some(item => item.name === p.name);
+    const plantSizes = p.sizes || [];
+    const singleSize = plantSizes.length === 1 ? plantSizes[0] : '';
+    const multiSize = plantSizes.length > 1;
+    const defaultSize = plantSizes.length > 0 ? plantSizes[0] : '';
+
+    const plantColors = p.colors || [];
+    const singleColor = plantColors.length === 1 ? plantColors[0] : '';
+    const multiColor = plantColors.length > 1;
+    const defaultColor = plantColors.length > 0 ? plantColors[0] : '';
+
+    const isInCart = cart.some(item => item.name === p.name && (item.color || '') === defaultColor && (item.size || '') === defaultSize);
+
     const displayImg = p.image 
       ? `<img src="${p.image}" alt="${p.name}" loading="lazy" decoding="async" ${p.imgPos ? `style="object-position: center ${p.imgPos};"` : ''}>` 
       : '🌸';
@@ -254,30 +278,19 @@ const renderProducts = (data) => {
     const btnText = isInCart ? 'En el carrito' : 'Añadir al carrito';
     const btnClass = `btn-agregar ${isInCart ? 'in-cart' : ''}`;
 
-    const plantSizes = p.sizes || [];
-    const singleSize = plantSizes.length === 1 ? plantSizes[0] : '';
-    const multiSize = plantSizes.length > 1;
-
-    const plantColors = p.colors || [];
-    const singleColor = plantColors.length === 1 ? plantColors[0] : '';
-    const multiColor = plantColors.length > 1;
-
-    let inlineBadges = '';
-    if (singleColor) inlineBadges += `<span class="plant-inline-badge">${singleColor}</span>`;
-    
-    const nameHTML = inlineBadges 
-      ? `<div class="plant-name-container"><div class="plant-name" style="margin-bottom:0;">${p.name}</div><div class="plant-badges">${inlineBadges}</div></div>`
-      : `<div class="plant-name">${p.name}</div>`;
-
-    const sizeBadgeHTML = singleSize ? `<span class="plant-size-badge">${singleSize}</span>` : '';
+    const nameHTML = `<div class="plant-name">${p.name}</div>`;
 
     // Diccionario de colores. Si en el futuro agregas "Blanca", puedes sumar 'Blanca': '#FFFFFF' aquí.
     const colorMap = {
       'Amarilla': '#FFD700',
       'Roja': '#E63946',
-      'Rosa': '#FFB5A7'
+      'Rosa': '#FFB5A7',
+      'Naranja': '#FFA500'
     };
     const getColorHex = (name) => colorMap[name] || '#cccccc';
+
+    const sizeBadgeHTML = singleSize ? `<span class="plant-size-badge">${singleSize}</span>` : '';
+    const colorBadgeHTML = singleColor ? `<span class="plant-badge" style="background-color: ${getColorHex(singleColor)}; color: ${singleColor === 'Roja' ? 'white' : 'var(--verde-oscuro)'};">${singleColor}</span>` : '';
 
     const colorSelectHTML = multiColor
       ? `<div class="color-selector" id="color-${p.name.replace(/\s+/g, '-')}">
@@ -307,6 +320,7 @@ const renderProducts = (data) => {
       <div class="plant-img">
         ${displayImg}
         ${sizeBadgeHTML}
+        ${colorBadgeHTML}
       </div>
       <div class="plant-info">
         ${nameHTML}
@@ -448,8 +462,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const pageCategory = document.body.dataset.category;
   let currentProducts = pageCategory 
     ? PRODUCTS_DATA.filter(p => p.category === pageCategory)
-    : PRODUCTS_DATA;
+    : [...PRODUCTS_DATA];
   
+  // Ordenar de la A a la Z por defecto
+  currentProducts.sort((a,b) => normalize(a.name).localeCompare(normalize(b.name)));
+
   if (document.getElementById('mainGrid')) {
     renderProducts(currentProducts);
   }
@@ -500,6 +517,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       }
+    }
+
+    // Actualizar dinámicamente el estado del botón si el usuario cambia el tamaño o color
+    if (e.target.matches('.color-swatch input[type="radio"]') || e.target.matches('.size-option input[type="radio"]')) {
+      updateButtonsState();
     }
   });
   
@@ -558,6 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   const sortSelect = document.getElementById('priceSort');
   if (sortSelect) {
+    sortSelect.value = 'az'; // Mostrar "A a la Z" visualmente por defecto en el selector
     sortSelect.addEventListener('change', (e) => {
       let sorted = [...currentProducts];
       const val = e.target.value;

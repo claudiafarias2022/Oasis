@@ -7,11 +7,12 @@ const PRODUCTS_DATA = [
     name: 'Árbol de Jade', 
     category: 'suculentas', 
     price: 3000, 
-    image: './imgs/suculentas/jade.png',  
+    image: './imgs/suculentas/jade-n6.jpg',  
     // Opciones de tamaño
-    sizes: ['N° 12', 'N° 14'], 
-    sizePrices: { 'N° 12': 3000, 'N° 14': 4500 }, 
-    sizeImages: { 'N° 12': './imgs/suculentas/jade.png', 'N° 14': './imgs/suculentas/jade_grande.png' } 
+    sizes: ['N° 6'], 
+    sizePrices: { 'N° 6': 1500, 'N° 12': 3000, 'N° 14': 4500 }, 
+    sizeImages: { 'N° 12': './imgs/suculentas/jade.png', 'N° 14': './imgs/suculentas/jade_grande.png', 'N° 6': './imgs/suculentas/jade-n6.jpg' } ,
+    imgPos: ' 40%' // Enfoca la parte de abajo de la foto
   },
   { 
     name: 'Money Maker Variegada', 
@@ -56,7 +57,8 @@ const PRODUCTS_DATA = [
     category: 'suculentas', 
     price: 3000, 
     image: './imgs/suculentas/echeveria-n12.jpg', 
-    sizes: ['N12']
+    sizes: ['N12'],
+    imgPos: '40%'
   },
   { 
     name: 'Lengua de Buey', 
@@ -67,59 +69,59 @@ const PRODUCTS_DATA = [
     imgPos: ''
   
   },
-
-  // ==========================================
-  // CATEGORÍA: INTERIOR / ORNAMENTALES
-  // ==========================================
-  
   { 
     name: 'Bromelia', 
     category: 'interior', 
     price: 2000, 
     image: './imgs/ornamentales/bromelia.png', 
-    desc: '' 
   },
   { 
     name: 'Callisia Repens', 
     category: 'interior', 
     price: 2500, 
     image: './imgs/ornamentales/callisiarepens.png', 
-    desc: '' 
   },
   { 
     name: 'Cretona', 
     category: 'interior', 
     price: 2000, 
-    image: './imgs/ornamentales/cretona.png', 
-    desc: '' 
+    image: './imgs/ornamentales/cretona.png',
+    imgPos: 'center'
   },
   { 
     name: 'Cretona (Variedad 2)', 
     category: 'interior', 
-    price: 2500, 
-    image: './imgs/ornamentales/cretona1.png', 
-    desc: '' 
+    price: 2000, 
+    image: './imgs/ornamentales/cretona1.png',
+    imgPos: '30%'
+  },
+  { 
+    name: 'Nacar', 
+    category: 'interior', 
+    price: 2000, 
+    image: './imgs/ornamentales/nacarrosa-n6.jpg', 
   },
   { 
     name: 'Dolar Negro', 
     category: 'interior', 
     price: 2500, 
     image: './imgs/ornamentales/dolarnegro.png', 
-    desc: '' 
+    imgPos: '40%'
+
   },
   { 
     name: 'Dolar Variegado', 
     category: 'interior', 
     price: 2500, 
     image: './imgs/ornamentales/dolarvariegado.png', 
-    desc: '' 
+    imgPos: '40%'
+  
   },
   { 
     name: 'Espada de San Jorge Mini', 
     category: 'interior', 
     price: 2500, 
     image: './imgs/ornamentales/espadadesanjorgemini.png', 
-    desc: '' 
   },
   { 
     name: 'Kalanchoe Blossfeldiana', 
@@ -139,27 +141,36 @@ const PRODUCTS_DATA = [
     category: 'interior', 
     price: 3000, 
     image: './imgs/ornamentales/ledebouriasocialis.png', 
-    desc: '' 
   },
   { 
     name: 'Senecio angulatus', 
     category: 'interior', 
     price: 2000, 
     image: './imgs/ornamentales/Senecio angulatus.png', 
-    desc: '' 
   },
   { 
     name: 'Tradescantia Fluminensis Variegata', 
     category: 'interior', 
     price: 1500, 
     image: './imgs/ornamentales/tradescantiafluminensisvariegata.png', 
-    desc: '' 
+  },
+
+  // ==========================================
+  // 🌸 CATEGORÍA: FLORES
+  // ==========================================
+  { 
+    name: 'Orquidea Patito', 
+    category: 'flores', 
+    price: 4500, 
+    image: './imgs/flores/orquideaspatito.jpg'
   },
   { 
-    name: 'Nose', 
-    category: 'interior', 
-    price: 2000, 
-    image: './imgs/ornamentales/nose.png', 
-    desc: '' 
-  }
+    name: 'Clivia', 
+    category: 'flores', 
+    price: 2500, 
+    sizes: ['N12'],
+    image: './imgs/flores/clivia-n12.jpg',
+    colors: ['Naranja']
+  },
+  
 ];

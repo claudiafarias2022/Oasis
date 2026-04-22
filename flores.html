@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flores — Oasis Vivero</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-category="flores">
+
+<!-- Componente compartido inyectado por script.js -->
+<div id="navbar-shared"></div>
+
+<section class="catalogo" style="padding-top: 8rem; min-height: 100vh;">
+  <div class="catalogo-header">
+    <div>
+      <p class="section-tag">Color y Alegría</p>
+      <h2 class="section-title">Flores</h2>
+      <p class="section-sub">Llená tus espacios de color y aroma con nuestra selección de flores frescas y hermosas.</p>
+      <div class="search-container">
+        <div class="search-wrapper">
+          <input type="text" id="plantSearch" class="search-input" placeholder="Buscar flores...">
+          <button id="clearSearch" class="search-clear">✕</button>
+        </div>
+        <div class="controls-row">
+          <select id="priceSort" class="sort-select">
+            <option value="default">Ordenar por</option>
+            <option value="low">Precio: Menor a Mayor</option>
+            <option value="high">Precio: Mayor a Menor</option>
+            <option value="az">Nombre: A a la Z</option>
+            <option value="za">Nombre: Z a la A</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-grid" id="mainGrid">
+    <!-- Se carga dinámicamente -->
+  </div>
+
+  <div id="noResults" style="display: none; text-align: center; padding: 4rem 2rem; color: var(--texto-suave);">
+    <p style="font-size: 1.2rem; font-family: 'Playfair Display', serif;">No se encontraron flores que coincidan 🌸</p>
+  </div>
+
+</section>
+
+<!-- Componente compartido inyectado por script.js -->
+<div id="footer-shared"></div>
+
+<!-- CARRITO UI -->
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h2 style="font-family: 'Playfair Display', serif; color: var(--verde-oscuro);">Tu Carrito</h2>
+    <button class="cart-close" id="closeCart">✕</button>
+  </div>
+  <div class="cart-items" id="cartItemsList"></div>
+  <div class="cart-footer">
+    <div class="cart-total">
+      <span>Total estimado:</span>
+      <span id="cartTotalText">$0</span>
+    </div>
+    <button class="btn-primary" style="width: 100%; border: none; cursor: pointer;" onclick="sendCartWhatsApp()">Enviar pedido por WhatsApp 🌿</button>
+    <button class="btn-clear" onclick="clearCart()">Vaciar Carrito</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
