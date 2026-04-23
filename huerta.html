@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plantas Ornamentales — Oasis Vivero</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body data-category="huerta">
+
+<div id="navbar-shared"></div>
+
+<section class="catalogo" style="padding-top: 8rem;">
+  <div class="catalogo-header">
+    <div>
+      <p class="section-tag">Exterior</p>
+      <h2 class="section-title">La Huerta</h2>
+      <p class="section-sub">La creación de una huerta fomenta la autosustentabilidad, invita a compartir tiempo con nuestros seres queridos y aprovechar al máximo cualquier espacio para producir alimentos saludables.</p>
+      <div class="search-container">
+        <div class="search-wrapper">
+          <input type="text" id="plantSearch" class="search-input" placeholder="Buscar plantas aromáticas...">
+          <button id="clearSearch" class="search-clear">✕</button>
+        </div>
+        <div class="controls-row">
+          <select id="priceSort" class="sort-select">
+            <option value="default">Ordenar por</option>
+            <option value="low">Precio: Menor a Mayor</option>
+            <option value="high">Precio: Mayor a Menor</option>
+            <option value="az">Nombre: A a la Z</option>
+            <option value="za">Nombre: Z a la A</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="cards-grid" id="mainGrid">
+    
+    <!-- Las tarjetas de las plantas se cargarán aquí automáticamente desde script.js -->
+  </div>
+
+  <div id="noResults" style="display: none; text-align: center; padding: 4rem 2rem; color: var(--texto-suave);">
+    <p style="font-size: 1.2rem; font-family: 'Playfair Display', serif;">No se encontraron plantas que coincidan 🌱</p>
+  </div>
+</section>

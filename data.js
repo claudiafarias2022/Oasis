@@ -173,4 +173,65 @@ const PRODUCTS_DATA = [
     colors: ['Naranja']
   },
   
+  { 
+    name: 'Romero (salvia rosmarinus)', 
+    category: 'aromaticas', 
+    price: 1500, 
+    image: './imgs/suculentas/jade-n6.jpg',  
+    // Opciones de tamaño
+    sizes: ['N° 10'], 
+    image: './imgs/aromaticas/romero (salvia rosmarinus).jpeg',  
+    imgPos: ' 40%' // Enfoca la parte de abajo de la foto
+  }, 
+{ 
+    name: 'Citronella', 
+    category: 'aromaticas', 
+    price: 1500, 
+    image: './imgs/suculentas/jade-n6.jpg',  
+    // Opciones de tamaño
+    sizes: ['N° 6'], 
+    image: './imgs/aromaticas/citronella.jpeg',  
+    imgPos: ' 50%' // Enfoca la parte de abajo de la foto
+  }, 
+{ 
+    name: 'Curry (Helichrysum italicum)', 
+    category: 'aromaticas', 
+    price: 1500, 
+    image: './imgs/suculentas/jade-n6.jpg',  
+    // Opciones de tamaño
+    sizes: ['N° 10'], 
+    image: './imgs/aromaticas/Curry (Helichrysum italicum.jpeg',  
+    imgPos: ' 40%' // Enfoca la parte de abajo de la foto
+  }, 
+{ 
+    name: 'Lavanda (lanata)', 
+    category: 'aromaticas', 
+    price: 1500, 
+    image: './imgs/suculentas/jade-n6.jpg',  
+    // Opciones de tamaño
+    sizes: ['N° 10'], 
+    image: './imgs/aromaticas/lavanda .jpeg',  
+    imgPos: ' 40%' // Enfoca la parte de abajo de la foto
+  }, 
+{ 
+    name: 'Lavanda Dentata', 
+    category: 'aromaticas', 
+    price: 1500, 
+    image: './imgs/suculentas/jade-n6.jpg',  
+    // Opciones de tamaño
+    sizes: ['N° 10'], 
+    image: './imgs/aromaticas/lavanda dentata.jpeg',  
+    imgPos: ' 50%' // Enfoca la parte de abajo de la foto
+  },
+  { 
+    name: 'Ruda M', 
+    category: 'aromaticas', 
+    price: 1500, 
+    image: './imgs/aromaticas/ruda m.jpeg',  
+    // Opciones de tamaño
+    sizes: ['N° 6'],  
+    imgPos: ' 50%' // Enfoca la parte de abajo de la foto
+  },
+
+  
 ];
