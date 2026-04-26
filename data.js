@@ -1,4 +1,58 @@
-const PRODUCTS_DATA = [
+// Variable global (ahora se actualizará dinámicamente)
+let PRODUCTS_DATA = [];
+
+// ID de tu Google Sheet
+// Recuerda: Cópialo de la URL normal de edición (.../d/ESTE_ES_EL_ID/edit)
+const SHEET_ID = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ-ghru-pQ1csVwPhqwHr6H0G0z5Ck6_Rbxki3IqibyhrYkC-URy3yTKMS5MzP-7ED45gv7Mof5znB-/pubhtml';
+
+async function loadProductsData() {
+  if (!SHEET_ID || SHEET_ID === 'TU_ID_DE_GOOGLE_SHEETS_AQUI') {
+    console.warn("No se configuró el ID del Sheet. Cargando catálogo local...");
+    PRODUCTS_DATA = FALLBACK_PRODUCTS;
+    return;
+  }
+
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+
+  try {
+    const response = await fetch(url);
+    const text = await response.text();
+    // Limpiar la respuesta de Google para obtener JSON puro
+    const jsonString = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+    const jsonData = JSON.parse(jsonString);
+
+    const cols = jsonData.table.cols.map(c => c ? c.label.toLowerCase().trim() : '');
+
+    PRODUCTS_DATA = jsonData.table.rows.map(row => {
+      let p = {};
+      row.c.forEach((cell, i) => {
+        if (cols[i]) p[cols[i]] = cell ? cell.v : null;
+      });
+
+      return {
+        name: p.name || 'Sin nombre',
+        category: p.category || 'interior',
+        price: Number(p.price) || 0,
+        image: p.image || '',
+        sizes: p.sizes ? String(p.sizes).split(',').map(s => s.trim()) : [],
+        colors: p.colors ? String(p.colors).split(',').map(c => c.trim()) : [],
+        imgPos: p.imgpos || 'center',
+        isHidden: p.ishidden === true || String(p.ishidden).toUpperCase() === 'SI',
+        sizePrices: p.sizeprices ? String(p.sizeprices).split(',').reduce((acc, curr) => {
+          const [size, price] = curr.split(':');
+          if (size && price) acc[size.trim()] = Number(price.trim());
+          return acc;
+        }, {}) : null
+      };
+    }).filter(p => p.name !== 'Sin nombre');
+
+  } catch (error) {
+    console.error('Error conectando a Google Sheets:', error);
+    PRODUCTS_DATA = FALLBACK_PRODUCTS;
+  }
+}
+
+const FALLBACK_PRODUCTS = [
   // ==========================================
   // 🌵 CATEGORÍA: SUCULENTAS
   // ==========================================
@@ -235,3 +289,42 @@ const PRODUCTS_DATA = [
 
   
 ];
+
+// ==========================================
+// HERRAMIENTA SECRETA: ENVIAR A GOOGLE SHEETS
+// ==========================================
+async function enviarDatosAGoogleSheets() {
+  // Pega aquí la URL que copiaste de Google Apps Script
+  const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyUtVgfnd5EBOh5wJrzUuCy7tXVun4m9p01RVsufldz8UE0o0OBiaYT9cFgKCLxkeAx/exec';
+
+  const datosParaEnviar = PRODUCTS_DATA.map(p => {
+    // Buscar los tamaños de forma segura
+    let finalSizes = '';
+    if (Array.isArray(p.sizes) && p.sizes.length > 0) {
+      finalSizes = p.sizes.join(', ');
+    } else if (typeof p.sizes === 'string' && p.sizes.trim() !== '') {
+      finalSizes = p.sizes; // Por si escribiste sizes: 'N° 6' sin los corchetes
+    } else if (p.sizePrices && Object.keys(p.sizePrices).length > 0) {
+      finalSizes = Object.keys(p.sizePrices).join(', '); // Auto-extraer si olvidaste poner el campo "sizes" pero llenaste "sizePrices"
+    }
+
+    return {
+      name: p.name,
+      category: p.category,
+      price: p.price,
+      sizes: finalSizes,
+      colors: Array.isArray(p.colors) ? p.colors.join(', ') : (p.colors || ''),
+      sizePrices: p.sizePrices ? Object.entries(p.sizePrices).map(([s, pr]) => `${s}:${pr}`).join(', ') : ''
+    };
+  });
+
+  try {
+    await fetch(WEB_APP_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(datosParaEnviar)
+    });
+  } catch (error) {
+    console.error("Error al enviar datos:", error);
+  }
+}

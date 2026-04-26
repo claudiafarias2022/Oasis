@@ -367,7 +367,7 @@ const injectSharedComponents = () => {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
         </a>
       </div>
-      <p>© 2026 <span>Oasis Vivero</span> · Hecho con 🌱 en Córdoba, Argentina</p>
+      <p>© 2026 <span ondblclick="if(typeof enviarDatosAGoogleSheets === 'function') { enviarDatosAGoogleSheets(); showToast('Enviando datos a la hoja oasis...'); }" style="user-select: none;">Oasis Vivero</span> · Hecho con 🌱 en Córdoba, Argentina</p>
     </footer>`;
 
   const navContainer = document.getElementById('navbar-shared');
@@ -453,8 +453,13 @@ window.toggleAddress = () => {
 };
 
 // --- INICIALIZACIÓN GENERAL ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   injectSharedComponents();
+
+  // Esperar a que se carguen los productos de Google Sheets
+  if (typeof loadProductsData === 'function') {
+    await loadProductsData();
+  }
 
   const normalize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
 
@@ -578,17 +583,79 @@ document.addEventListener('DOMContentLoaded', () => {
   // Actualiza los botones de las tarjetas manuales al cargar la página
   updateButtonsState();
   
+  const searchInput = document.getElementById('plantSearch');
+  const clearSearchBtn = document.getElementById('clearSearch');
+  const noResultsMsg = document.getElementById('noResults');
   const sortSelect = document.getElementById('priceSort');
-  if (sortSelect) {
-    sortSelect.value = 'az'; // Mostrar "A a la Z" visualmente por defecto en el selector
-    sortSelect.addEventListener('change', (e) => {
-      let sorted = [...currentProducts];
-      const val = e.target.value;
-      if(val === 'low') sorted.sort((a,b) => a.price - b.price);
-      else if(val === 'high') sorted.sort((a,b) => b.price - a.price);
-      else if(val === 'az') sorted.sort((a,b) => normalize(a.name).localeCompare(normalize(b.name)));
-      else if(val === 'za') sorted.sort((a,b) => normalize(b.name).localeCompare(normalize(a.name)));
-      renderProducts(sorted);
+  const sizeFilter = document.getElementById('sizeFilter');
+
+  if (sortSelect) sortSelect.value = 'az';
+
+  // Poblar el filtro de tamaños dinámicamente con los que existan en la página actual
+  if (sizeFilter) {
+    const allSizes = new Set();
+    currentProducts.forEach(p => {
+      let sArray = p.sizes || [];
+      if (typeof sArray === 'string') sArray = [sArray];
+      if (sArray.length === 0 && p.sizePrices) sArray = Object.keys(p.sizePrices);
+      
+      sArray.forEach(s => allSizes.add(s.trim()));
+    });
+    Array.from(allSizes).sort().forEach(size => {
+      if (!size) return;
+      const opt = document.createElement('option');
+      opt.value = size;
+      opt.textContent = `Tamaño: ${size}`;
+      sizeFilter.appendChild(opt);
+    });
+  }
+
+  // Sistema unificado: Búsqueda + Filtro + Ordenamiento
+  const applyAllFilters = () => {
+    let filtered = [...currentProducts];
+
+    // 1. Filtrar por búsqueda de texto
+    const term = searchInput ? normalize(searchInput.value.trim()) : '';
+    if (term) {
+      filtered = filtered.filter(p => normalize(p.name).includes(term));
+    }
+
+    // 2. Filtrar por tamaño seleccionado
+    if (sizeFilter && sizeFilter.value !== 'all') {
+      filtered = filtered.filter(p => {
+        let sArray = p.sizes || [];
+        if (typeof sArray === 'string') sArray = [sArray];
+        if (sArray.length === 0 && p.sizePrices) sArray = Object.keys(p.sizePrices);
+        return sArray.map(s => s.trim()).includes(sizeFilter.value);
+      });
+    }
+
+    // 3. Aplicar ordenamiento
+    if (sortSelect) {
+      const val = sortSelect.value;
+      if (val === 'low') filtered.sort((a, b) => a.price - b.price);
+      else if (val === 'high') filtered.sort((a, b) => b.price - a.price);
+      else if (val === 'az') filtered.sort((a, b) => normalize(a.name).localeCompare(normalize(b.name)));
+      else if (val === 'za') filtered.sort((a, b) => normalize(b.name).localeCompare(normalize(a.name)));
+    }
+
+    renderProducts(filtered);
+
+    const visibleCount = filtered.filter(p => !p.isHidden).length;
+    if (noResultsMsg) noResultsMsg.style.display = visibleCount > 0 ? 'none' : 'block';
+    if (clearSearchBtn) clearSearchBtn.style.display = term.length > 0 ? 'block' : 'none';
+  };
+
+  // Escuchar todos los cambios
+  if (searchInput) searchInput.addEventListener('input', applyAllFilters);
+  if (sizeFilter) sizeFilter.addEventListener('change', applyAllFilters);
+  if (sortSelect) sortSelect.addEventListener('change', applyAllFilters);
+  
+  if (clearSearchBtn) {
+    clearSearchBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      applyAllFilters();
+      searchInput.focus();
     });
   }
 
@@ -608,34 +675,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   updateCartUI();
-
-  // Lógica de búsqueda en tiempo real
-  const searchInput = document.getElementById('plantSearch');
-  const clearSearchBtn = document.getElementById('clearSearch');
-  const noResultsMsg = document.getElementById('noResults');
-
-  if (searchInput && clearSearchBtn) {
-    const filterPlants = (term) => {
-      const searchTerm = normalize(term.trim());
-      
-      // Filter based on the currently displayed products (which are already filtered by category and hidden status)
-      const filtered = currentProducts.filter(p => normalize(p.name).includes(searchTerm));
-      
-      renderProducts(filtered, true); // Reutiliza la función principal respetando la paginación
-      
-      const visibleCount = filtered.filter(p => !p.isHidden).length;
-      if (noResultsMsg) noResultsMsg.style.display = visibleCount > 0 ? 'none' : 'block';
-      clearSearchBtn.style.display = searchTerm.length > 0 ? 'block' : 'none';
-    };
-
-    searchInput.addEventListener('input', (e) => filterPlants(e.target.value));
-
-    clearSearchBtn.addEventListener('click', () => {
-      searchInput.value = '';
-      filterPlants('');
-      searchInput.focus();
-    });
-  }
 
   // --- LÓGICA DEL POP-UP DE IMÁGENES ---
   const imageModal = document.getElementById('imageModal');
